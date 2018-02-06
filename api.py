@@ -5,7 +5,25 @@ import googlemaps
 
 
 app = Flask(__name__)
+"""
+This api key is connected to a project on a free google developers account
+It has the following restrictions:
+ - Only has access to Google Directions API
+ - limited to 2500 requests per day
+ - limited to 50 requests per second**
+Ref: https://developers.google.com/maps/documentation/directions/usage-limits?hl=en_US
 
+**  under the basic implementation, for N addresses provided to this api, n(n-1) requests
+	are made to the Google API.  This means that the limit is when N > 7
+	possible solutions to this:
+
+		1) manually throttle requests on this end
+
+		2) there may be a way to use the waypoints argument to
+		  collapse multiple requests down into 1, however this
+		  would put more reliance on the Google API to provide
+		  the most efficient route between 2 points (see get_shortest_route())
+"""
 api_key = 'AIzaSyBGsse-VeQiKgcjHqQsBpQDnCLJpjZjPQ0'
 
 gmaps = googlemaps.Client(key=api_key)
