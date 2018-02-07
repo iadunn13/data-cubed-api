@@ -1,5 +1,10 @@
 import googlemaps
 from collections import defaultdict
+import logging
+
+
+LOG_FILENAME = 'api.log'
+logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
 
 
 """
@@ -62,6 +67,15 @@ def process_request(request_locations):
 	start_address = request_locations[0]
 	end_address = request_locations[-1]
 	waypoints = request_locations[1:-1]
+	# log outgoing requests to the Google API
+	logging.debug(
+		"Requesting directions for start={}, end={}, and waypoints={}".format(
+			start_address,
+			end_address,
+			waypoints
+		)
+	)
+
 	return gmaps.directions(
 		start_address,
 		end_address,
@@ -103,4 +117,10 @@ def retrieve_direction_data(locations):
 	if len(request_locations) > 0:
 		responses.append(process_request(request_locations))
 
+	logging.debug(
+		"On an input of {} locations, {} call(s) were made to the Google API".format(
+			len(locations),
+			len(responses)
+		)
+	)
 	return responses
