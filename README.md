@@ -32,7 +32,7 @@ curl -X GET -H Accept:application/json -H Content-Type:application/json --data '
 ```
 
 #### Notes:
-I've included a Google API key in this project that I've set up specifically for this project and it only has access to the Google Maps Directions API.  Since the key I set up was free, there is a requests per second limit of 50 (See [here](https://developers.google.com/maps/documentation/directions/usage-limits?hl=en_US).
+I've included a Google API key in this project that I've set up specifically for this project and it only has access to the Google Maps Directions API.  Since the key I set up was free, there is a requests per second limit of 50 (See [here](https://developers.google.com/maps/documentation/directions/usage-limits?hl=en_US)).
 My API should be making only one call to Google, so this limit will only be reached if a lot of requests are sent to my API at once.
 
 The process of determining the most efficient path becomes too computationally expensive at around 11 locations.  This is because for N locations in the graph, there are N! possible paths that pass through all nodes.  For the time being I have put in a check to require 10 locations or less.
