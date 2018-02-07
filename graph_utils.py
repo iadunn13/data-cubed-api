@@ -1,43 +1,38 @@
-from itertools import permutations
 from collections import defaultdict
-from gmaps_integration import get_directions
+from itertools import permutations
 
 
-def get_edge_from_route(route):
+def get_edge_from_leg(leg):
 	"""
-	Converts a route from the Google Directions API to an edge
+	Converts a route leg from the Google Directions API to an edge
 	for use in our graph (essentially just cuts out extraneous data)
 	"""
-	path = route['legs'][0]
 	return {
-		"start": path['start_address'],
-		"end": path['end_address'],
-		"duration": path['duration']['value'],
-		"distance": path['distance']['value'],
+		"start": leg['start_address'],
+		"end": leg['end_address'],
+		"duration": leg['duration']['value'],
+		"distance": leg['distance']['value'],
 	}
 
 
-def get_shortest_route(routes):
-	"""
-	takes a list of routes from the Google Directions API and returns
-	the shortest route
+def add_edge_to_graph(graph, edge):
+	# due to the way the api calls are condensed,
+	# there may be duplicate legs present
+	# if for some reason one was better than the other
+	# we should use it
+	start_address = edge["start"]
+	end_address = edge["end"]
+	#import pdb; pdb.set_trace()
+	if (not graph["edges"][start_address]
+			or end_address not in graph["edges"][start_address]
+			or graph["edges"][start_address][end_address]["duration"] > edge["duration"]):
+		graph["edges"][start_address][end_address] = edge
 
-	I would rather call the API with alternatives=True and determine
-	the best route from the response locally instead of assuming the
-	API will return the best option.  This also leaves room to add
-	more complex analysis for determining route efficiency
-	"""
-
-	# Note:
-	# as per the API docs, routes with no intermediate waypoints
-	# will only have 1 element in 'legs'
-
-	# for the sake of simplicity, I am considering the shortest duration to be
-	# the most efficient
-	return min(routes, key=lambda x: x['legs'][0]['duration']['value'])
+	if start_address not in graph["nodes"]:
+		graph["nodes"].append(start_address)
 
 
-def build_graph(addresses):
+def build_graph(direction_data):
 	""" 
 	simple graph where each node has an edge to each other node
 	the distances of the edges will be represented by the distances
@@ -57,31 +52,18 @@ def build_graph(addresses):
 			.
 		} for start_address in graph.nodes
 	}
-
 	"""
 	graph = {
 		"nodes": [],
-		"edges": {}
+		"edges": defaultdict(dict)
 	}
-	for i, start in enumerate(addresses):
-		address = start
-		for end in addresses[:i] + addresses[i+1:]:
-			# create an edge for each pair of locations
-			# going in both directions
-			directions = get_directions(start, end)
-			shortest_route = get_shortest_route(directions)
-			edge = get_edge_from_route(shortest_route)
-
-			start_address = edge['start']
-			if start_address not in graph['edges']:
-				# key everything using the exact string returned from the API
-				# it doesn't always match exactly with the initial input string
-				# (i.e. one may have the zipcode, country, etc. and the other doesn't)
-				graph['edges'][start_address] = {}
-				address = start_address
-
-			graph['edges'][start_address][edge['end']] = edge
-		graph['nodes'].append(address)
+	for response in direction_data:
+		for route in response:
+			for leg in route['legs']:
+				start_address = leg["start_address"]
+				end_address = leg["end_address"]
+				edge = get_edge_from_leg(leg)
+				add_edge_to_graph(graph, edge)				
 
 	return graph
 
@@ -102,11 +84,6 @@ def get_path_details(path, edges):
 
 
 def get_best_path(graph):
-	"""
-	Since the determination of the best path through all locations relies on
-	checking every possible path that does so (for n locations, there are n!
-	possible paths that goes through each location)
-	"""
 	possible_paths = permutations(graph['nodes'])
 
 	# grab the first path
