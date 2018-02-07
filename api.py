@@ -23,7 +23,10 @@ def efficient_path():
 	if len(request_addresses) == 0:
 		request_addresses = request.json["addresses"]
 
-	if len(request_addresses) > 9:
+	# graph_utils.get_best_path() relies on the itertools.permutations generator
+	# which results in N! iterations for on an input of N locations
+	# at N=10, the time this takes is getting pretty high, better to cap it at 10 for now
+	if len(request_addresses) > 10:
 		return json.dumps({"error": "too many locations provided"})
 
 	direction_data = retrieve_direction_data(request_addresses)
