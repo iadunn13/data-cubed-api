@@ -16,7 +16,13 @@ def efficient_path():
 		I've restricted it to a maximum of 9 locations because processing all permutation paths
 		in graph_util.get_best_path() tends to cause my VM to crash around N=10
 	"""
+
+	# for my own testing I used the requests library, which would put the data into request.values
+	# but when testing with curl on the command line the addresses get put into request.json
 	request_addresses = request.values.getlist('addresses')
+	if len(request_addresses) == 0:
+		request_addresses = request.json["addresses"]
+
 	if len(request_addresses) > 9:
 		return json.dumps({"error": "too many locations provided"})
 
