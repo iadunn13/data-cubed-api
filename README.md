@@ -7,6 +7,8 @@ Please write a Python server that takes the addresses of 3 locations (valid addr
 
 For a bonus, allow as input an arbitrary number of locations as opposed to just 3.
 
+
+## My Solution:
 ### Setup Steps:
 This solution was written in Python 3.5.3 and uses Flask and the Google Maps API
 If you are running a different version of Python, it may be easiest to just set up a virtual env using [pyenv](https://github.com/pyenv/pyenv-virtualenv)
@@ -22,6 +24,12 @@ To run this API server, clone/download this repo and from the project directory 
 
 This should have the server running and have the API accessible at http://127.0.0.1:5000/
 Logging output will be seen in api.log
+
+The format I used to test with cURL was the following:
+
+```
+curl -X GET -H Accept:application/json -H Content-Type:application/json --data '{"addresses": [...]}' http://127.0.0.1:5000/
+```
 
 #### Notes:
 I've included a Google API key in this project that I've set up specifically for this project and it only has access to the Google Maps Directions API.  Since the key I set up was free, there is a requests per second limit of 50 (See [here](https://developers.google.com/maps/documentation/directions/usage-limits?hl=en_US).
