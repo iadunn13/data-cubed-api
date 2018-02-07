@@ -33,7 +33,7 @@ curl -X GET -H Accept:application/json -H Content-Type:application/json --data '
 
 #### Notes:
 I've included a Google API key in this project that I've set up specifically for this project and it only has access to the Google Maps Directions API.  Since the key I set up was free, there is a requests per second limit of 50 (See [here](https://developers.google.com/maps/documentation/directions/usage-limits?hl=en_US).
-This limit will be reached if any more than 7 locations are passed in to my API, or if a lot of requests are sent to my API at once.
+My API should be making only one call to Google, so this limit will only be reached if a lot of requests are sent to my API at once.
 
-I can circumvent the rate limit by condensing calls to the Google API into batches of 25 locations at once (retrieving data for 24 edges of the graph per request) since the free key is allowed up to 23 intermediate waypoints per request, but the process of determining the most efficient path becomes too computationally expensive at around 11 locations.  This is because for N locations in the graph, there are N! possible paths that pass through all nodes.  My VM tended to crash at N=11 or N=12, so I just opted to cap the number of addresses allowed by my server.
+The process of determining the most efficient path becomes too computationally expensive at around 11 locations.  This is because for N locations in the graph, there are N! possible paths that pass through all nodes.  For the time being I have put in a check to require 10 locations or less.
 
