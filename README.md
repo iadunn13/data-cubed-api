@@ -25,7 +25,18 @@ To run this API server, clone/download this repo and from the project directory 
 This should have the server running and have the API accessible at http://127.0.0.1:5000/
 Logging output will be seen in api.log
 
-The format I used to test with cURL was the following:
+The API should work using both the requests library or cURL
+
+With requests:
+
+```
+import requests
+data = {"addresses": [...]}
+url = "http://127.0.0.1:5000/"
+requests.get(url, data=data)
+```
+
+With cURL:
 
 ```
 curl -X GET -H Accept:application/json -H Content-Type:application/json --data '{"addresses": [...]}' http://127.0.0.1:5000/
